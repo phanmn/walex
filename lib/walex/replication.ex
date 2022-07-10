@@ -13,7 +13,8 @@ defmodule WalEx.Replication do
 
   use GenServer
 
-  alias WalEx.Adapters.Postgres.EpgsqlServer
+  # alias WalEx.Adapters.Postgres.EpgsqlServer
+  alias WalEx.Adapters.Postgres.PostgrexReplication
   alias WalEx.Events
   alias WalEx.Types
 
@@ -87,7 +88,7 @@ defmodule WalEx.Replication do
        when commit_lsn == current_txn_lsn do
     process_events(state)
 
-    :ok = EpgsqlServer.acknowledge_lsn(end_lsn)
+    :ok = PostgrexReplication.acknowledge_lsn(end_lsn)
 
     %{state | transaction: nil}
   end

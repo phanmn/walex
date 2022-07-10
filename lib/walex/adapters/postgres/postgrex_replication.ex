@@ -16,6 +16,10 @@ defmodule WalEx.Adapters.Postgres.PostgrexReplication do
       )
   )
 
+  def acknowledge_lsn(lsn) do
+    GenServer.call(__MODULE__, {:ack_lsn, lsn})
+  end
+
   def start_link(opts) do
     # Automatically reconnect if we lose connection.
     extra_opts = [
@@ -25,7 +29,7 @@ defmodule WalEx.Adapters.Postgres.PostgrexReplication do
     Postgrex.ReplicationConnection.start_link(
       __MODULE__,
       opts,
-      extra_opts ++ (opts |> Keyword.get(:postgrex_params))
+      extra_opts ++ (opts |> Keyword.get(:postgrex_params)) ++ [name: __MODULE__]
     )
   end
 
@@ -111,6 +115,29 @@ defmodule WalEx.Adapters.Postgres.PostgrexReplication do
       end
 
     {:noreply, messages, state}
+  end
+
+  @impl true
+  def handle_call({:ack_lsn, {xlog, offset}}, from, state) do
+    from
+    |> Postgrex.ReplicationConnection.reply(:ok)
+
+    <<last_processed_lsn::integer-64>> = <<xlog::integer-32, offset::integer-32>>
+
+    messages = [
+      <<?r, last_processed_lsn::64, last_processed_lsn::64, last_processed_lsn::64,
+        current_time()::64, 0>>
+    ]
+
+    {:noreply, messages, state}
+  end
+
+  @impl true
+  def handle_call({:ack_lsn, _}, from, state) do
+    from
+    |> Postgrex.ReplicationConnection.reply(:error)
+
+    {:noreply, state}
   end
 
   @epoch DateTime.to_unix(~U[2000-01-01 00:00:00Z], :microsecond)

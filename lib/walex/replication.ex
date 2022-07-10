@@ -58,6 +58,13 @@ defmodule WalEx.Replication do
   end
 
   @impl true
+  def handle_info({:postgrex_replication, binary_msg}, state) do
+    decoded = WalEx.Adapters.Postgres.Decoder.decode_message(binary_msg)
+
+    {:noreply, process_message(decoded, state)}
+  end
+
+  @impl true
   def handle_info(_msg, state) do
     {:noreply, state}
   end

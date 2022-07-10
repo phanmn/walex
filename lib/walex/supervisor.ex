@@ -18,23 +18,24 @@ defmodule WalEx.Supervisor do
     # Use this var to convert to sigil at connection
     host = Application.get_env(:walex, :db_host)
 
-    epgsql_params = %{
+    postgrex_params = [
       host: ~c(#{host}),
       username: Application.get_env(:walex, :db_user),
       database: Application.get_env(:walex, :db_name),
       password: Application.get_env(:walex, :db_password),
       port: Application.get_env(:walex, :db_port),
       ssl: Application.get_env(:walex, :db_ssl)
-    }
+    ]
 
-    epgsql_params =
+    postgrex_params =
       with {:ok, ip_version} <- Application.get_env(:walex, :db_ip_version),
-           {:error, :einval} <- :inet.parse_address(epgsql_params.host) do
-        # only add :tcp_opts to epgsql_params when ip_version is present and host
+           {:error, :einval} <- :inet.parse_address(postgrex_params[:host]) do
+        # only add :tcp_opts to postgrex_params when ip_version is present and host
         # is not an IP address.
-        Map.put(epgsql_params, :tcp_opts, [ip_version])
+        postgrex_params
+        |> Keyword.put(:tcp_opts, [ip_version])
       else
-        _ -> epgsql_params
+        _ -> postgrex_params
       end
 
     publications = Application.get_env(:walex, :publications) |> Jason.decode!()
@@ -56,7 +57,7 @@ defmodule WalEx.Supervisor do
         WalEx.DatabaseReplicationSupervisor,
         # You can provide a different WAL position if desired, or default to
         # allowing Postgres to send you what it thinks you need
-        epgsql_params: epgsql_params,
+        postgrex_params: postgrex_params,
         publications: publications,
         slot_name: slot_name,
         wal_position: {"0", "0"},

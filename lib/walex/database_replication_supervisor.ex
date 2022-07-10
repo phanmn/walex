@@ -1,7 +1,7 @@
 defmodule WalEx.DatabaseReplicationSupervisor do
   use Supervisor
 
-  alias WalEx.Adapters.Postgres.EpgsqlServer
+  alias WalEx.Adapters.Postgres.PostgrexReplication
   alias WalEx.Replication
 
   def start_link(config) do
@@ -12,7 +12,7 @@ defmodule WalEx.DatabaseReplicationSupervisor do
   def init(config) do
     children = [
       Replication,
-      {EpgsqlServer, config}
+      {PostgrexReplication, config}
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

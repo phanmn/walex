@@ -24,7 +24,9 @@ defmodule WalEx.Supervisor do
       database: Application.get_env(:walex, :db_name),
       password: Application.get_env(:walex, :db_password),
       port: Application.get_env(:walex, :db_port),
-      ssl: Application.get_env(:walex, :db_ssl)
+      ssl: Application.get_env(:walex, :db_ssl),
+      pool: Application.get_env(:walex, :db_pool),
+      pool_size: Application.get_env(:walex, :db_pool_size),
     ]
 
     postgrex_params =

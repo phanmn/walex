@@ -13,7 +13,6 @@ defmodule WalEx.Replication do
 
   use GenServer
 
-  # alias WalEx.Adapters.Postgres.EpgsqlServer
   alias WalEx.Adapters.Postgres.PostgrexReplication
   alias WalEx.Events
   alias WalEx.Types

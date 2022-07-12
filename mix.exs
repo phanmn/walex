@@ -27,7 +27,6 @@ defmodule WalEx.MixProject do
   defp deps do
     [
       {:decimal, "~> 2.0"},
-      {:epgsql, "~> 4.6.0"},
       {:ex_doc, "~> 0.26.0", only: :dev, runtime: false},
       {:jason, "~> 1.3"},
       {:map_diff, "~> 1.3"},

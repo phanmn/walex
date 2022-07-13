@@ -30,7 +30,7 @@ defmodule WalEx.MixProject do
       {:ex_doc, "~> 0.26.0", only: :dev, runtime: false},
       {:jason, "~> 1.3"},
       {:map_diff, "~> 1.3"},
-      {:retry, "~> 0.15.0"},
+      {:retry, git: "https://github.com/phanmn/ElixirRetry.git"},
       {:timex, "~> 3.7.8"},
       {:postgrex, "~> 0.16.3"}
     ]
